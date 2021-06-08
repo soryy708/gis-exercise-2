@@ -1,0 +1,29 @@
+body {
+    color: #1a1a1a;
+    background-color: #E4E4E4;
+    font-family: system-ui, -apple-system, -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 24px;
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); /* Padding to avoid the "unsafe" areas behind notches in the screen */
+}
+
+#root {
+    max-width: 1280px;
+    margin: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.footer {
+    width: 100%;
+}
