@@ -13,6 +13,11 @@ const config = {
                     transpileOnly: true,
                 },
             }],
+        }, {
+            test: /\.(geo)?json$/u,
+            use: [{
+                loader: 'json-loader',
+            }],
         }],
     },
     resolve: {

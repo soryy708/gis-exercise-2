@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import L, { Map, PolylineOptions, MarkerOptions, LeafletMouseEvent, Icon } from 'leaflet';
+import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon } from 'leaflet';
 
 type LeafletMapProps = {
     defaultCenter?: [number, number];
@@ -11,6 +11,10 @@ type LeafletMapProps = {
             dashArray?: string;
             onClick?: () => void;
         }[];
+        geojson?: {
+            data: Record<string, any>;
+            options?: GeoJSONOptions,
+        }[],
     };
     markers?: {
         latlng: [number, number],
@@ -72,6 +76,13 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
                     if (layer.onClick) {
                         polyLine.on('click', layer.onClick);
                     }
+                });
+            }
+
+            if (props.layers.geojson) {
+                props.layers.geojson.forEach(layer => {
+                    const geojson = L.geoJSON(layer.data as any, layer.options);
+                    geojson.addTo(map);
                 });
             }
         }
