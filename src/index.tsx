@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ReactDom from 'react-dom';
-import L, { LatLngBounds, Map } from 'leaflet';
+import L, { LatLng, LatLngBounds, Map } from 'leaflet';
 import LeafletMap from './component/leafletMap';
 import cordova from './cordova';
 import geolocation, { Position } from './geolocation';
-import { bboxClip, polygon as turfPolygon, booleanWithin } from '@turf/turf';
+import { bboxClip, polygon as turfPolygon, booleanWithin, nearestPointOnLine, Feature, Point, FeatureCollection, LineString } from '@turf/turf';
+import PathFinder from 'geojson-path-finder';
 
 const waterSymbol = '🚰';
 const shopSymbol = '🛒';
@@ -43,10 +44,13 @@ const App: React.FunctionComponent = () => {
     const [rentalAndShopsData, setRentalAndShopsData] = useState<Record<string, any>>(null);
     const [waysData, setWaysData] = useState<Record<string, any>>(null);
     const [waterData, setWaterData] = useState<Record<string, any>>(null);
+    const [roads, setRoads] = useState<FeatureCollection<LineString>>(null);
     const [foodData, setFoodData] = useState<Record<string, any>>(null);
     const [toiletData, setToiletData] = useState<Record<string, any>>(null);
     const [bounds, setBounds] = useState<LatLngBounds>(null);
     const [map, setMap] = useState<Map>(null);
+    const [destination, setDestination] = useState<LatLng>(null);
+    const [navigationCoordinates, setNavigationCoordinates] = useState<LatLng[]>([]);
 
     useEffect(() => {
         const callback = (position: Position) => {
@@ -87,7 +91,43 @@ const App: React.FunctionComponent = () => {
         import('./geojson/toilets.geojson')
             .then(data => setToiletData(data))
             .catch(err => console.error(err));
+        import('./geojson/roads ashdod.geojson')
+            .then((data: any) => setRoads(data))
+            .catch(err => console.error(err));
     }, []);
+
+    useEffect(() => {
+        if (!destination || isNaN(latitude) || isNaN(longitude)) {
+            return;
+        }
+
+        const nearestPointOnRoad = (lat: number, long: number): Feature<Point> => {
+            const points: Feature<Point>[] = roads.features.map((road: any) => nearestPointOnLine(road, [long, lat]));
+            const [nearestPoint, , indexOfNearest]: [Feature<Point, {index: number}>, number, number] = points.reduce((prev: any, point, i) => {
+                const [nearPoint, nearestDistance, prevI] = prev;
+                const distance = Math.sqrt(Math.pow(lat - point.geometry.coordinates[1], 2) + Math.pow(long - point.geometry.coordinates[0], 2));
+                if (nearPoint === null || nearestDistance === Infinity || prevI === -1) {
+                    return [point, distance, i];
+                }
+                if (distance < nearestDistance) {
+                    return [point, distance, i];
+                }
+                return [nearPoint, nearestDistance, prevI] as [Feature<Point>, number, number];
+            }, [null, Infinity, -1] as [Feature<Point, {index: number}>, number, number]);
+            const closestCoordinatesOfLine = roads.features[indexOfNearest].geometry.coordinates[nearestPoint.properties.index];
+            return {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'Point',
+                    coordinates: closestCoordinatesOfLine,
+                },
+            };
+        };
+        const pathFinder = new PathFinder(roads as any);
+        const path = pathFinder.findPath(nearestPointOnRoad(latitude, longitude), nearestPointOnRoad(destination.lat, destination.lng));
+        setNavigationCoordinates(path.path.map(([long, lat]) => new LatLng(lat, long)));
+    }, [destination, latitude, longitude]);
 
     const pointsInBounds = (data: Record<string, any>) => {
         if (!data || !bounds) {
@@ -198,12 +238,17 @@ const App: React.FunctionComponent = () => {
             onBoundsChange={newBounds => setBounds(newBounds)}
             onMapChange={newMap => setMap(newMap)}
             layers={{
+                polyline: [{
+                    latlngs: navigationCoordinates,
+                    color: '#00f',
+                }],
                 geojson: geoJsonLayers,
             }}
             markers={!isNaN(latitude) && !isNaN(longitude) ? [{
                 latlng: [longitude, latitude],
                 icon: positionIcon,
             }] : null}
+            onClick={ev => setDestination(ev.latlng)}
         />
         <div className="controls">
             <button

@@ -28,6 +28,9 @@ const config = {
             '.tsx',
             '.jsx',
         ],
+        alias: {
+            'tinyqueue': path.join(__dirname, 'node_modules', 'tinyqueue', 'tinyqueue.js'),
+        },
     },
     watchOptions: {
         ignored: ['node_modules'],

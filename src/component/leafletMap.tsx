@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, DivIcon, LatLngBounds, LatLngBoundsExpression } from 'leaflet';
+import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, DivIcon, LatLngBounds, LatLngBoundsExpression, LatLngExpression } from 'leaflet';
 
 type LeafletMapProps = {
     defaultCenter?: [number, number];
@@ -9,7 +9,7 @@ type LeafletMapProps = {
     maxBounds?: LatLngBoundsExpression;
     layers?: {
         polyline?: {
-            latlngs: Array<[number, number]>;
+            latlngs: LatLngExpression[];
             color?: string;
             dashArray?: string;
             onClick?: () => void;
