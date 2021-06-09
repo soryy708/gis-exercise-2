@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon } from 'leaflet';
 
-const myPositionIcon = L.divIcon({ html: '📍'  });
+const usersPositionIcon = L.divIcon({ html: '📍'  });
 
 type LeafletMapProps = {
     defaultCenter?: [number, number];
@@ -61,7 +61,7 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
         }
 
         const currentPosition=map.locate({setView:false,maxZoom:14,watch:true}).on('locationfound', e=> {
-            L.marker(e.latlng,{icon:myPositionIcon}).addTo(map);
+            L.marker(e.latlng,{icon:usersPositionIcon}).addTo(map);
         });
         if(currentPosition !== userPosition){
             setUserPosition(currentPosition);
