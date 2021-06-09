@@ -25,6 +25,7 @@ type LeafletMapProps = {
     }[],
     onClick?: (ev: LeafletMouseEvent) => void;
     onBoundsChange?: (bounds: LatLngBounds) => void;
+    onMapChange?: (newMap: Map) => void;
 };
 
 const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapProps) => {
@@ -55,6 +56,9 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
         }).addTo(newMap);
 
         setMap(newMap);
+        if (props.onMapChange) {
+            props.onMapChange(newMap);
+        }
         setTileLayer(newTileLayer);
     }, [rootRef.current]);
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDom from 'react-dom';
-import L, { LatLngBounds } from 'leaflet';
+import L, { LatLngBounds, Map } from 'leaflet';
 import LeafletMap from './component/leafletMap';
 import cordova from './cordova';
 import geolocation, { Position } from './geolocation';
@@ -38,9 +38,14 @@ const App: React.FunctionComponent = () => {
     const [foodData, setFoodData] = useState<Record<string, any>>(null);
     const [toiletData, setToiletData] = useState<Record<string, any>>(null);
     const [bounds, setBounds] = useState<LatLngBounds>(null);
+    const [map, setMap] = useState<Map>(null);
 
     useEffect(() => {
         const callback = (position: Position) => {
+            if (isNaN(latitude) || isNaN(longitude)) { // The 1st time the user's location is known
+                map.panTo([position.latitude, position.longitude], {animate: true});
+            }
+
             setLatitude(position.latitude);
             setLongitude(position.longitude);
         };
@@ -48,7 +53,7 @@ const App: React.FunctionComponent = () => {
         return () => {
             geolocation.unwatchPosition(callback);
         };
-    }, []);
+    }, [map]);
 
     useEffect(() => {
         import('./geojson/bicycle parking.geojson')
@@ -178,6 +183,7 @@ const App: React.FunctionComponent = () => {
                 [34, 37.5],
             ]}
             onBoundsChange={newBounds => setBounds(newBounds)}
+            onMapChange={newMap => setMap(newMap)}
             layers={{
                 geojson: geoJsonLayers,
             }}
