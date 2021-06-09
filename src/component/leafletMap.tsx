@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon } from 'leaflet';
 
+const myPositionIcon = L.divIcon({ html: '📍'  });
+
 type LeafletMapProps = {
     defaultCenter?: [number, number];
     defaultZoom?: number;
@@ -27,8 +29,10 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
     const rootRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<Map>(null);
     const [tileLayer, setTileLayer] = useState(null);
+    const [userPosition, setUserPosition] = useState(null);
 
     useEffect(() => {
+        setUserPosition(null);
         if (!rootRef.current || rootRef.current.classList.contains('leaflet-container')) {
             return;
         }
@@ -56,6 +60,16 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
             return;
         }
 
+        const currentPosition=map.locate({setView:false,maxZoom:14,watch:true}).on('locationfound', e=> {
+            L.marker(e.latlng,{icon:myPositionIcon}).addTo(map);
+        });
+        if(currentPosition !== userPosition){
+            setUserPosition(currentPosition);
+        }
+        map.on('locationerror', e=> {
+            alert(e.message);
+        });
+    
         map.eachLayer(layer => {
             if (layer !== tileLayer) {
                 map.removeLayer(layer);
@@ -84,6 +98,7 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
                     const geojson = L.geoJSON(layer.data as any, layer.options);
                     geojson.addTo(map);
                 });
+                console.log('reacted here');
             }
         }
         if (props.markers) {
