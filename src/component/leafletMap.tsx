@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, LatLngBounds } from 'leaflet';
+import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, LatLngBounds, LatLngBoundsExpression } from 'leaflet';
 
 type LeafletMapProps = {
     defaultCenter?: [number, number];
     defaultZoom?: number;
     minZoom?: number;
     maxZoom?: number;
+    maxBounds?: LatLngBoundsExpression;
     layers?: {
         polyline?: {
             latlngs: Array<[number, number]>;
@@ -41,6 +42,7 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
             zoom: props.defaultZoom,
             minZoom: props.minZoom,
             maxZoom: props.maxZoom,
+            maxBounds: props.maxBounds,
         });
         if (props.onClick) {
             newMap.on('click', props.onClick);
