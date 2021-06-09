@@ -4,6 +4,8 @@ import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEve
 type LeafletMapProps = {
     defaultCenter?: [number, number];
     defaultZoom?: number;
+    minZoom?: number;
+    maxZoom?: number;
     layers?: {
         polyline?: {
             latlngs: Array<[number, number]>;
@@ -37,6 +39,8 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
         const newMap = L.map(rootRef.current, {
             center: props.defaultCenter,
             zoom: props.defaultZoom,
+            minZoom: props.minZoom,
+            maxZoom: props.maxZoom,
         });
         if (props.onClick) {
             newMap.on('click', props.onClick);
