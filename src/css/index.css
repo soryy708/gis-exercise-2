@@ -20,6 +20,10 @@ body {
 
 .icon {
     background: transparent;
+    font-size: 2em;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
 }
 
 .leaflet-container {
