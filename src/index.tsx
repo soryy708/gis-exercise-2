@@ -51,6 +51,7 @@ const App: React.FunctionComponent = () => {
     const [map, setMap] = useState<Map>(null);
     const [destination, setDestination] = useState<LatLng>(null);
     const [navigationCoordinates, setNavigationCoordinates] = useState<LatLng[]>([]);
+    const [navigationDistance, setNavigationDistance] = useState<number>(NaN);
 
     useEffect(() => {
         const callback = (position: Position) => {
@@ -127,6 +128,7 @@ const App: React.FunctionComponent = () => {
         const pathFinder = new PathFinder(roads as any);
         const path = pathFinder.findPath(nearestPointOnRoad(latitude, longitude), nearestPointOnRoad(destination.lat, destination.lng));
         setNavigationCoordinates(path.path.map(([long, lat]) => new LatLng(lat, long)));
+        setNavigationDistance(path.weight * 1000);
     }, [destination, latitude, longitude]);
 
     const pointsInBounds = (data: Record<string, any>) => {
@@ -290,6 +292,9 @@ const App: React.FunctionComponent = () => {
         <div className="footer">
             {!isNaN(latitude) && !isNaN(longitude) && <React.Fragment>
                 lat={latitude.toPrecision(6)} long={longitude.toPrecision(6)}
+                {!isNaN(navigationDistance) && <React.Fragment>
+                    &nbsp;dist={Math.round(navigationDistance)}m
+                </React.Fragment>}
             </React.Fragment>}
         </div>
     </React.Fragment>;
