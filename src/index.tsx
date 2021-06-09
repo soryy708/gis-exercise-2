@@ -11,14 +11,15 @@ import waterData from './geojson/drinking water.geojson';
 import foodData from './geojson/food vendors.geojson';
 import toiletData from './geojson/toilets.geojson';
 
-const parkingIcon    = L.divIcon({ html: '🅿️' });
-const shopIcon       = L.divIcon({ html: '🛒' });
-const waterIcon      = L.divIcon({ html: '🚰' });
-const coffeeIcon     = L.divIcon({ html: '☕' });
-const burgerIcon     = L.divIcon({ html: '🍔' });
-const restaurantIcon = L.divIcon({ html: '🍴' });
-const kioskIcon      = L.divIcon({ html: '🥤' });
-const toiletIcon     = L.divIcon({ html: '🚻' });
+const parkingIcon    = L.divIcon({ html: '🅿️', className: 'icon' });
+const shopIcon       = L.divIcon({ html: '🛒', className: 'icon' });
+const waterIcon      = L.divIcon({ html: '🚰', className: 'icon' });
+const coffeeIcon     = L.divIcon({ html: '☕', className: 'icon' });
+const burgerIcon     = L.divIcon({ html: '🍔', className: 'icon' });
+const restaurantIcon = L.divIcon({ html: '🍴', className: 'icon' });
+const kioskIcon      = L.divIcon({ html: '🥤', className: 'icon' });
+const toiletIcon     = L.divIcon({ html: '🚻', className: 'icon' });
+
 
 const App: React.FunctionComponent = () => {
     const [latitude, setLatitude] = useState<number>(NaN);
