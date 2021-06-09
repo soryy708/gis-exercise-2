@@ -172,6 +172,7 @@ const App: React.FunctionComponent = () => {
         <LeafletMap
             defaultCenter={[31.807663, 34.658638]}
             defaultZoom={16}
+            minZoom={8}
             onBoundsChange={newBounds => setBounds(newBounds)}
             layers={{
                 geojson: geoJsonLayers,
