@@ -4,12 +4,6 @@ import L from 'leaflet';
 import LeafletMap from './component/leafletMap';
 import cordova from './cordova';
 import geolocation, { Position } from './geolocation';
-import parkingData from './geojson/bicycle parking.geojson';
-import rentalAndShopsData from './geojson/bike rental and shops.geojson';
-import waysData from './geojson/cycle ways.geojson';
-import waterData from './geojson/drinking water.geojson';
-import foodData from './geojson/food vendors.geojson';
-import toiletData from './geojson/toilets.geojson';
 
 const parkingIcon    = L.divIcon({ html: '🅿️', className: 'icon' });
 const shopIcon       = L.divIcon({ html: '🛒', className: 'icon' });
@@ -36,6 +30,12 @@ const App: React.FunctionComponent = () => {
     const [showFood, toggleShowFood] = useBoolean(false);
     const [showShops, toggleShowShops] = useBoolean(false);
     const [showParking, toggleShowParking] = useBoolean(false);
+    const [parkingData, setParkingData] = useState<Record<string, any>>(null);
+    const [rentalAndShopsData, setRentalAndShopsData] = useState<Record<string, any>>(null);
+    const [waysData, setWaysData] = useState<Record<string, any>>(null);
+    const [waterData, setWaterData] = useState<Record<string, any>>(null);
+    const [foodData, setFoodData] = useState<Record<string, any>>(null);
+    const [toiletData, setToiletData] = useState<Record<string, any>>(null);
 
     useEffect(() => {
         const callback = (position: Position) => {
@@ -46,6 +46,27 @@ const App: React.FunctionComponent = () => {
         return () => {
             geolocation.unwatchPosition(callback);
         };
+    }, []);
+
+    useEffect(() => {
+        import('./geojson/bicycle parking.geojson')
+            .then(data => setParkingData(data))
+            .catch(err => console.error(err));
+        import('./geojson/bike rental and shops.geojson')
+            .then(data => setRentalAndShopsData(data))
+            .catch(err => console.error(err));
+        import('./geojson/cycle ways.geojson')
+            .then(data => setWaysData(data))
+            .catch(err => console.error(err));
+        import('./geojson/drinking water.geojson')
+            .then(data => setWaterData(data))
+            .catch(err => console.error(err));
+        import('./geojson/food vendors.geojson')
+            .then(data => setFoodData(data))
+            .catch(err => console.error(err));
+        import('./geojson/toilets.geojson')
+            .then(data => setToiletData(data))
+            .catch(err => console.error(err));
     }, []);
 
     const geoJsonLayers: {data: Record<string, any>, options: L.GeoJSONOptions}[] = [{
