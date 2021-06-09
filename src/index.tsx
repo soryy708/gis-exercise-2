@@ -6,14 +6,20 @@ import cordova from './cordova';
 import geolocation, { Position } from './geolocation';
 import { bboxClip, polygon as turfPolygon, booleanWithin } from '@turf/turf';
 
-const parkingIcon    = L.divIcon({ html: '🅿️', className: 'icon' });
-const shopIcon       = L.divIcon({ html: '🛒', className: 'icon' });
-const waterIcon      = L.divIcon({ html: '🚰', className: 'icon' });
+const waterSymbol = '🚰';
+const shopSymbol = '🛒';
+const parkingSymbol = '🅿️';
+const burgerSymbol = '🍔';
+const toiletSymbol = '🚻';
+
+const parkingIcon    = L.divIcon({ html: parkingSymbol, className: 'icon' });
+const shopIcon       = L.divIcon({ html: shopSymbol, className: 'icon' });
+const waterIcon      = L.divIcon({ html: waterSymbol, className: 'icon' });
 const coffeeIcon     = L.divIcon({ html: '☕', className: 'icon' });
-const burgerIcon     = L.divIcon({ html: '🍔', className: 'icon' });
+const burgerIcon     = L.divIcon({ html: burgerSymbol, className: 'icon' });
 const restaurantIcon = L.divIcon({ html: '🍴', className: 'icon' });
 const kioskIcon      = L.divIcon({ html: '🥤', className: 'icon' });
-const toiletIcon     = L.divIcon({ html: '🚻', className: 'icon' });
+const toiletIcon     = L.divIcon({ html: toiletSymbol, className: 'icon' });
 
 const useBoolean = (defaultVal: boolean): [boolean, () => void] => {
     const [val, setVal] = useState<boolean>(defaultVal);
@@ -194,35 +200,35 @@ const App: React.FunctionComponent = () => {
                 className={showToilet ? 'on' : ''}
                 onClick={() => toggleShowToilet()}
             >
-                🚻 Toilet
+                {toiletSymbol} Toilet
             </button>
             <button
                 type="button"
                 className={showWater ? 'on' : ''}
                 onClick={() => toggleShowWater()}
             >
-                🚰 Water
+                {waterSymbol} Water
             </button>
             <button
                 type="button"
                 className={showFood ? 'on' : ''}
                 onClick={() => toggleShowFood()}
             >
-                🍔 Food
+                {burgerSymbol} Food
             </button>
             <button
                 type="button"
                 className={showShops ? 'on' : ''}
                 onClick={() => toggleShowShops()}
             >
-                🛒 Shops
+                {shopSymbol} Shops
             </button>
             <button
                 type="button"
                 className={showParking ? 'on' : ''}
                 onClick={() => toggleShowParking()}
             >
-                🅿️ Parking
+                {parkingSymbol} Parking
             </button>
         </div>
         <div className="footer">
