@@ -30,6 +30,7 @@ const useBoolean = (defaultVal: boolean): [boolean, () => void] => {
 };
 
 const App: React.FunctionComponent = () => {
+    const [localized, setLocalized] = useState<boolean>(false);
     const [latitude, setLatitude] = useState<number>(NaN);
     const [longitude, setLongitude] = useState<number>(NaN);
     const [showToilet, toggleShowToilet] = useBoolean(false);
@@ -48,18 +49,23 @@ const App: React.FunctionComponent = () => {
 
     useEffect(() => {
         const callback = (position: Position) => {
-            if (isNaN(latitude) || isNaN(longitude)) { // The 1st time the user's location is known
-                map.panTo([position.latitude, position.longitude], {animate: true});
-            }
-
             setLatitude(position.latitude);
             setLongitude(position.longitude);
+            setLocalized(true);
         };
         geolocation.watchPosition(callback);
         return () => {
             geolocation.unwatchPosition(callback);
         };
     }, [map]);
+
+    useEffect(() => {
+        if (!map || !localized) {
+            return;
+        }
+
+        map.panTo([latitude, longitude], {animate: true});
+    }, [localized, map]);
 
     useEffect(() => {
         import('./geojson/bicycle parking.geojson')
