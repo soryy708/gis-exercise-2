@@ -98,7 +98,6 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
                     const geojson = L.geoJSON(layer.data as any, layer.options);
                     geojson.addTo(map);
                 });
-                console.log('reacted here');
             }
         }
         if (props.markers) {
