@@ -173,6 +173,10 @@ const App: React.FunctionComponent = () => {
             defaultCenter={[31.807663, 34.658638]}
             defaultZoom={16}
             minZoom={8}
+            maxBounds={[
+                [29, 33.6],
+                [34, 37.5],
+            ]}
             onBoundsChange={newBounds => setBounds(newBounds)}
             layers={{
                 geojson: geoJsonLayers,
