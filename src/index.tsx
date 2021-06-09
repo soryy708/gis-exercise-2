@@ -6,15 +6,21 @@ import cordova from './cordova';
 import geolocation, { Position } from './geolocation';
 import { bboxClip, polygon as turfPolygon, booleanWithin } from '@turf/turf';
 
-const parkingIcon    = L.divIcon({ html: '🅿️', className: 'icon' });
-const shopIcon       = L.divIcon({ html: '🛒', className: 'icon' });
-const waterIcon      = L.divIcon({ html: '🚰', className: 'icon' });
+const waterSymbol = '🚰';
+const shopSymbol = '🛒';
+const parkingSymbol = '🅿️';
+const burgerSymbol = '🍔';
+const toiletSymbol = '🚻';
+
+const parkingIcon    = L.divIcon({ html: parkingSymbol, className: 'icon' });
+const shopIcon       = L.divIcon({ html: shopSymbol, className: 'icon' });
+const waterIcon      = L.divIcon({ html: waterSymbol, className: 'icon' });
 const coffeeIcon     = L.divIcon({ html: '☕', className: 'icon' });
-const burgerIcon     = L.divIcon({ html: '🍔', className: 'icon' });
+const burgerIcon     = L.divIcon({ html: burgerSymbol, className: 'icon' });
 const restaurantIcon = L.divIcon({ html: '🍴', className: 'icon' });
 const kioskIcon      = L.divIcon({ html: '🥤', className: 'icon' });
-const toiletIcon     = L.divIcon({ html: '🚻', className: 'icon' });
 const positionIcon   = L.divIcon({ html: '📍', className:'icon' });
+const toiletIcon     = L.divIcon({ html: toiletSymbol, className: 'icon' });
 
 const useBoolean = (defaultVal: boolean): [boolean, () => void] => {
     const [val, setVal] = useState<boolean>(defaultVal);
@@ -25,6 +31,7 @@ const useBoolean = (defaultVal: boolean): [boolean, () => void] => {
 };
 
 const App: React.FunctionComponent = () => {
+    const [localized, setLocalized] = useState<boolean>(false);
     const [latitude, setLatitude] = useState<number>(NaN);
     const [longitude, setLongitude] = useState<number>(NaN);
     const [showToilet, toggleShowToilet] = useBoolean(false);
@@ -43,18 +50,23 @@ const App: React.FunctionComponent = () => {
 
     useEffect(() => {
         const callback = (position: Position) => {
-            if (isNaN(latitude) || isNaN(longitude)) { // The 1st time the user's location is known
-                map.panTo([position.latitude, position.longitude], {animate: true});
-            }
-
             setLatitude(position.latitude);
             setLongitude(position.longitude);
+            setLocalized(true);
         };
         geolocation.watchPosition(callback);
         return () => {
             geolocation.unwatchPosition(callback);
         };
     }, [map]);
+
+    useEffect(() => {
+        if (!map || !localized) {
+            return;
+        }
+
+        map.panTo([latitude, longitude], {animate: true});
+    }, [localized, map]);
 
     useEffect(() => {
         import('./geojson/bicycle parking.geojson')
@@ -199,35 +211,35 @@ const App: React.FunctionComponent = () => {
                 className={showToilet ? 'on' : ''}
                 onClick={() => toggleShowToilet()}
             >
-                🚻 Toilet
+                {toiletSymbol} Toilet
             </button>
             <button
                 type="button"
                 className={showWater ? 'on' : ''}
                 onClick={() => toggleShowWater()}
             >
-                🚰 Water
+                {waterSymbol} Water
             </button>
             <button
                 type="button"
                 className={showFood ? 'on' : ''}
                 onClick={() => toggleShowFood()}
             >
-                🍔 Food
+                {burgerSymbol} Food
             </button>
             <button
                 type="button"
                 className={showShops ? 'on' : ''}
                 onClick={() => toggleShowShops()}
             >
-                🛒 Shops
+                {shopSymbol} Shops
             </button>
             <button
                 type="button"
                 className={showParking ? 'on' : ''}
                 onClick={() => toggleShowParking()}
             >
-                🅿️ Parking
+                {parkingSymbol} Parking
             </button>
         </div>
         <div className="footer">
