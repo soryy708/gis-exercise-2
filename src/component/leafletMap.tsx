@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon } from 'leaflet';
+import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, LatLngBounds } from 'leaflet';
 
 type LeafletMapProps = {
     defaultCenter?: [number, number];
@@ -21,6 +21,7 @@ type LeafletMapProps = {
         icon?: Icon,
     }[],
     onClick?: (ev: LeafletMouseEvent) => void;
+    onBoundsChange?: (bounds: LatLngBounds) => void;
 };
 
 const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapProps) => {
@@ -99,6 +100,22 @@ const LeafletMap: React.FunctionComponent<LeafletMapProps> = (props: LeafletMapP
             });
         }
     }, [map, tileLayer, props.layers, props.markers]);
+
+    useEffect(() => {
+        if (!map) {
+            return () => {};
+        }
+
+        const onMoveEnd = () => {
+            if (props.onBoundsChange) {
+                props.onBoundsChange(map.getBounds());
+            }
+        };
+        map.on('moveend', onMoveEnd);
+        return () => {
+            map.removeEventListener('moveend', onMoveEnd);
+        };
+    }, [map, props.onBoundsChange]);
 
     return <div
         ref={rootRef}

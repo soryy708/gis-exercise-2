@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ReactDom from 'react-dom';
-import L from 'leaflet';
+import L, { LatLngBounds } from 'leaflet';
 import LeafletMap from './component/leafletMap';
 import cordova from './cordova';
 import geolocation, { Position } from './geolocation';
+import { bboxClip, polygon as turfPolygon, booleanWithin } from '@turf/turf';
 
 const parkingIcon    = L.divIcon({ html: '🅿️', className: 'icon' });
 const shopIcon       = L.divIcon({ html: '🛒', className: 'icon' });
@@ -36,6 +37,7 @@ const App: React.FunctionComponent = () => {
     const [waterData, setWaterData] = useState<Record<string, any>>(null);
     const [foodData, setFoodData] = useState<Record<string, any>>(null);
     const [toiletData, setToiletData] = useState<Record<string, any>>(null);
+    const [bounds, setBounds] = useState<LatLngBounds>(null);
 
     useEffect(() => {
         const callback = (position: Position) => {
@@ -69,8 +71,36 @@ const App: React.FunctionComponent = () => {
             .catch(err => console.error(err));
     }, []);
 
+    const pointsInBounds = (data: Record<string, any>) => {
+        if (!data || !bounds) {
+            return data;
+        }
+
+        return {
+            ...data,
+            features: data.features.filter((point: any) => {
+                const boundingPolygon = turfPolygon([[
+                    [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
+                    [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
+                    [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
+                    [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
+                    [bounds.getSouthWest().lng, bounds.getSouthWest().lat],
+                ]]);
+                return booleanWithin(point, boundingPolygon);
+            })
+        };
+    };
+
     const geoJsonLayers: {data: Record<string, any>, options: L.GeoJSONOptions}[] = [{
-        data: waysData,
+        data: (waysData && bounds) ? {
+            ...waysData,
+            features: waysData.features.map((feature: any) => bboxClip(feature, [
+                bounds.getSouthWest().lng,
+                bounds.getSouthWest().lat,
+                bounds.getNorthEast().lng,
+                bounds.getNorthEast().lat,
+            ]))
+        } : waysData,
         options: {
             style: () => ({
                 color: '#01367c', // same as bicycle road sign
@@ -80,7 +110,7 @@ const App: React.FunctionComponent = () => {
     }];
     if (showParking) {
         geoJsonLayers.push({
-            data: parkingData,
+            data: pointsInBounds(parkingData),
             options: {
                 pointToLayer: (_point, latlng) =>
                     L.marker(latlng, { icon: parkingIcon }),
@@ -89,7 +119,7 @@ const App: React.FunctionComponent = () => {
     }
     if (showShops) {
         geoJsonLayers.push({
-            data: rentalAndShopsData,
+            data: pointsInBounds(rentalAndShopsData),
             options: {
                 pointToLayer: (_point, latlng) =>
                     L.marker(latlng, { icon: shopIcon }),
@@ -98,7 +128,7 @@ const App: React.FunctionComponent = () => {
     }
     if (showWater) {
         geoJsonLayers.push({
-            data: waterData,
+            data: pointsInBounds(waterData),
             options: {
                 pointToLayer: (_point, latlng) =>
                     L.marker(latlng, { icon: waterIcon }),
@@ -107,7 +137,7 @@ const App: React.FunctionComponent = () => {
     }
     if (showFood) {
         geoJsonLayers.push({
-            data: foodData,
+            data: pointsInBounds(foodData),
             options: {
                 pointToLayer: (point, latlng) => {
                     const icon = (() => {
@@ -130,7 +160,7 @@ const App: React.FunctionComponent = () => {
     }
     if (showToilet) {
         geoJsonLayers.push({
-            data: toiletData,
+            data: pointsInBounds(toiletData),
             options: {
                 pointToLayer: (_point, latlng) =>
                     L.marker(latlng, { icon: toiletIcon }),
@@ -142,6 +172,7 @@ const App: React.FunctionComponent = () => {
         <LeafletMap
             defaultCenter={[31.807663, 34.658638]}
             defaultZoom={16}
+            onBoundsChange={newBounds => setBounds(newBounds)}
             layers={{
                 geojson: geoJsonLayers,
             }}
