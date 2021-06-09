@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "./dist/",
+        "outDir": "./www/",
         "noImplicitAny": true,
         "module": "ES2020",
         "target": "es2015",
