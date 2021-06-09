@@ -19,6 +19,7 @@ const coffeeIcon     = L.divIcon({ html: '☕', className: 'icon' });
 const burgerIcon     = L.divIcon({ html: burgerSymbol, className: 'icon' });
 const restaurantIcon = L.divIcon({ html: '🍴', className: 'icon' });
 const kioskIcon      = L.divIcon({ html: '🥤', className: 'icon' });
+const positionIcon   = L.divIcon({ html: '📍', className:'icon' });
 const toiletIcon     = L.divIcon({ html: toiletSymbol, className: 'icon' });
 
 const useBoolean = (defaultVal: boolean): [boolean, () => void] => {
@@ -199,6 +200,10 @@ const App: React.FunctionComponent = () => {
             layers={{
                 geojson: geoJsonLayers,
             }}
+            markers={!isNaN(latitude) && !isNaN(longitude) ? [{
+                latlng: [longitude, latitude],
+                icon: positionIcon,
+            }] : null}
         />
         <div className="controls">
             <button

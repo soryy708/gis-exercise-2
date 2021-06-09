@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, LatLngBounds, LatLngBoundsExpression } from 'leaflet';
+import L, { Map, PolylineOptions, MarkerOptions, GeoJSONOptions, LeafletMouseEvent, Icon, DivIcon, LatLngBounds, LatLngBoundsExpression } from 'leaflet';
 
 type LeafletMapProps = {
     defaultCenter?: [number, number];
@@ -21,7 +21,7 @@ type LeafletMapProps = {
     };
     markers?: {
         latlng: [number, number],
-        icon?: Icon,
+        icon?: Icon | DivIcon,
     }[],
     onClick?: (ev: LeafletMouseEvent) => void;
     onBoundsChange?: (bounds: LatLngBounds) => void;
